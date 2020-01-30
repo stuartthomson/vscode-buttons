@@ -29,6 +29,17 @@
 				"title": "Run a command...",
 				"category": "Buttons"
 			}
+		],
+		"configuration":[
+			{
+				"title": "Buttons",
+				"properties": {
+					"buttons.scripts": {
+						"type": "array",
+						"description": "The scripts to be run when pressing buttons."
+					}
+				}
+			}
 		]
 	},
 	"scripts": {

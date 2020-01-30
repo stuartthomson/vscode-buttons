@@ -18,13 +18,24 @@ export class ButtonsProvider implements vscode.TreeDataProvider<Button> {
 	}
 
 	getChildren(): Thenable<Button[]> {
-        return Promise.resolve([
-            new Button('Button 1', vscode.TreeItemCollapsibleState.None, {
-                command: 'vscode-buttons.runCommand',
-                title: '',
-                arguments: []
-            })
-        ]);
+
+		const configScripts = vscode.workspace.getConfiguration('buttons').get<[string]>('scripts');
+
+		if (configScripts === undefined) {
+			return Promise.resolve([]);
+		}
+
+        return Promise.resolve(
+            configScripts.map(script => this.createButton(script))
+        );
+	}
+
+	createButton(script: string): Button {
+		return new Button('Button 1', vscode.TreeItemCollapsibleState.None, {
+			command: 'vscode-buttons.runCommand',
+			title: '',
+			arguments: [script]
+		});
 	}
 }
 
