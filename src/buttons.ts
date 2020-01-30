@@ -20,7 +20,7 @@ export class ButtonsProvider implements vscode.TreeDataProvider<Button> {
 	getChildren(): Thenable<Button[]> {
         return Promise.resolve([
             new Button('Button 1', vscode.TreeItemCollapsibleState.None, {
-                command: 'extension.pressButton',
+                command: 'vscode-buttons.runCommand',
                 title: '',
                 arguments: []
             })

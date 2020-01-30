@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 
 import { ButtonsProvider } from './buttons';
+import { runCommand } from './runCommand';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -11,6 +12,8 @@ export function activate(context: vscode.ExtensionContext) {
 	const buttonsProvider = new ButtonsProvider(vscode.workspace.rootPath);
 
 	vscode.window.registerTreeDataProvider('buttons', buttonsProvider);
+
+	vscode.commands.registerCommand('vscode-buttons.runCommand', runCommand);
 
 }
 

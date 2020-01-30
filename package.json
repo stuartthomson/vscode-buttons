@@ -10,18 +10,26 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onView:buttons"
+		"onView:buttons",
+		"onCommand:vscode-buttons:runCommand"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"views": {
 			"explorer": [
-			  {
-				"id": "buttons",
-				"name": "Custom Buttons"
-			  }
+				{
+					"id": "buttons",
+					"name": "Custom Buttons"
+				}
 			]
-		  }
+		},
+		"commands": [
+			{
+				"command": "vscode-buttons.runCommand",
+				"title": "Run a command...",
+				"category": "Buttons"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
