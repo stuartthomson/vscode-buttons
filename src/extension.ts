@@ -6,18 +6,36 @@ import { runCommand } from './runCommand';
 import { getWorkspaceFolder } from './utils';
 
 
-
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	const buttonsProvider = new ButtonsProvider(getWorkspaceFolder().uri.fsPath);
+	const folderPath = getWorkspaceFolder().uri.fsPath;
 
-	vscode.window.registerTreeDataProvider('buttons', buttonsProvider);
+	context.workspaceState.update('terminals', {});
 
-	vscode.commands.registerCommand('vscode-buttons.runCommand', runCommand);
+	const buttonsProvider = new ButtonsProvider(folderPath, context.workspaceState);
+
+	let watcher = vscode.workspace.createFileSystemWatcher(`${folderPath}/buttons.jsonc`, false, false, false);
+	watcher.onDidChange(() => { buttonsProvider.refresh(); });
+	watcher.onDidDelete(() => { buttonsProvider.refresh(); });
+	watcher.onDidCreate(() => { buttonsProvider.refresh(); });
+
+	context.subscriptions.push(
+		watcher
+	);
+
+	context.subscriptions.push(
+		vscode.window.registerTreeDataProvider('buttons', buttonsProvider)
+	);
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('vscode-buttons.runCommand', runCommand)
+	);
+
+	context.workspaceState.update('terminals', {});
 
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }

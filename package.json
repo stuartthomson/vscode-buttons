@@ -19,7 +19,7 @@
 			"explorer": [
 				{
 					"id": "buttons",
-					"name": "Custom Buttons"
+					"name": "Buttons"
 				}
 			]
 		},
@@ -35,7 +35,13 @@
 				"fileMatch": "**/buttons.jsonc",
 				"url": "./src/buttonsSchema.json"
 			}
-		]
+		],
+		"menus": {
+			"commandPalette": [{
+				"command": "vscode-buttons.runCommand",
+				"when": "false"
+			}]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

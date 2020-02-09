@@ -2,13 +2,12 @@ import * as fs from 'fs';
 import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { getWorkspaceFolder } from './utils';
 
 
 export interface IButtonConfig {
 	name: string;
 	description?: string;
-    script: string;
+	script: string;
 }
 
 export interface IButtonsConfig {
@@ -20,7 +19,12 @@ export class ButtonsProvider implements vscode.TreeDataProvider<Button> {
 	private _onDidChangeTreeData: vscode.EventEmitter<Button | undefined> = new vscode.EventEmitter<Button | undefined>();
 	readonly onDidChangeTreeData: vscode.Event<Button | undefined> = this._onDidChangeTreeData.event;
 
-	constructor(private workspaceRoot: string | undefined) {
+	private _folderPath: string | undefined;
+	private _workspaceState: vscode.Memento;
+
+	constructor(private folderPath: string | undefined, workspaceState: vscode.Memento) {
+		this._folderPath = folderPath;
+		this._workspaceState = workspaceState;
 	}
 
 	refresh(): void {
@@ -32,25 +36,33 @@ export class ButtonsProvider implements vscode.TreeDataProvider<Button> {
 	}
 
 	getChildren(): Thenable<Button[]> {
-		let folder: vscode.WorkspaceFolder = getWorkspaceFolder();
 
-		let config = <IButtonsConfig>jsonc.parse(fs.readFileSync(`${folder.uri.fsPath}/buttons.jsonc`, 'utf-8'));
-		console.log(config);
-
-		if (config === undefined) {
+		if (this._folderPath === undefined) {
 			return Promise.resolve([]);
 		}
 
-        return Promise.resolve(
-            config.buttons.map(buttonConfig => this.createButton(buttonConfig))
-        );
+		const configPath: string = `${this._folderPath}/buttons.jsonc`;
+
+		if (fs.existsSync(configPath)) {
+			let config = <IButtonsConfig>jsonc.parse(fs.readFileSync(configPath, 'utf-8'));
+			if (config !== undefined) {
+				return Promise.resolve(
+					config.buttons.map((buttonConfig, index) => {
+						return this.createButton(buttonConfig, index);
+					})
+				);
+			}
+		}
+
+		return Promise.resolve([]);
+
 	}
 
-	createButton(buttonConfig: IButtonConfig): Button {
+	createButton(buttonConfig: IButtonConfig, index: number): Button {
 		return new Button(buttonConfig.name, vscode.TreeItemCollapsibleState.None, {
 			command: 'vscode-buttons.runCommand',
 			title: buttonConfig.description === undefined ? '' : buttonConfig.description,
-			arguments: [buttonConfig.script]
+			arguments: [buttonConfig, index, this._workspaceState]
 		});
 	}
 }
@@ -62,7 +74,7 @@ export class Button extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-		public readonly command: vscode.Command
+		public readonly command: vscode.Command,
 	) {
 		super(label, collapsibleState);
 		this._script = command.arguments === undefined ? '' : `${command.arguments[0]}`;
