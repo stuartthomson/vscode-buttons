@@ -7,7 +7,7 @@
 		"type": "git",
 		"url": "https://github.com/stuartthomson/vscode-buttons.git"
 	},
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"engines": {
 		"vscode": "^1.41.0"
 	},
@@ -42,10 +42,12 @@
 			}
 		],
 		"menus": {
-			"commandPalette": [{
-				"command": "vscode-buttons.runCommand",
-				"when": "false"
-			}]
+			"commandPalette": [
+				{
+					"command": "vscode-buttons.runCommand",
+					"when": "false"
+				}
+			]
 		}
 	},
 	"scripts": {
