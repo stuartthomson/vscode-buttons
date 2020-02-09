@@ -1,5 +1,19 @@
-import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as jsonc from 'jsonc-parser';
 import * as path from 'path';
+import * as vscode from 'vscode';
+import { getWorkspaceFolder } from './utils';
+
+
+export interface IButtonConfig {
+	name: string;
+	description?: string;
+    script: string;
+}
+
+export interface IButtonsConfig {
+	buttons: IButtonConfig[];
+}
 
 export class ButtonsProvider implements vscode.TreeDataProvider<Button> {
 
@@ -18,44 +32,51 @@ export class ButtonsProvider implements vscode.TreeDataProvider<Button> {
 	}
 
 	getChildren(): Thenable<Button[]> {
+		let folder: vscode.WorkspaceFolder = getWorkspaceFolder();
 
-		const configScripts = vscode.workspace.getConfiguration('buttons').get<[string]>('scripts');
+		let config = <IButtonsConfig>jsonc.parse(fs.readFileSync(`${folder.uri.fsPath}/buttons.jsonc`, 'utf-8'));
+		console.log(config);
 
-		if (configScripts === undefined) {
+		if (config === undefined) {
 			return Promise.resolve([]);
 		}
 
         return Promise.resolve(
-            configScripts.map(script => this.createButton(script))
+            config.buttons.map(buttonConfig => this.createButton(buttonConfig))
         );
 	}
 
-	createButton(script: string): Button {
-		return new Button('Button 1', vscode.TreeItemCollapsibleState.None, {
+	createButton(buttonConfig: IButtonConfig): Button {
+		return new Button(buttonConfig.name, vscode.TreeItemCollapsibleState.None, {
 			command: 'vscode-buttons.runCommand',
-			title: '',
-			arguments: [script]
+			title: buttonConfig.description === undefined ? '' : buttonConfig.description,
+			arguments: [buttonConfig.script]
 		});
 	}
 }
 
-
 export class Button extends vscode.TreeItem {
+
+	_script: string;
 
 	constructor(
 		public readonly label: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-		public readonly command?: vscode.Command
+		public readonly command: vscode.Command
 	) {
 		super(label, collapsibleState);
+		this._script = command.arguments === undefined ? '' : `${command.arguments[0]}`;
 	}
 
 	get tooltip(): string {
-		return `${this.label} tooltip`;
+		if (this._script === '') {
+			return `There is no script associated with this button.`;
+		}
+		return `Script is: ${this._script}`;
 	}
 
 	get description(): string {
-		return `${this.label} description`;
+		return `${this.command.title}`;
 	}
 
 	iconPath = {

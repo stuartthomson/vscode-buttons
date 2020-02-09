@@ -30,15 +30,10 @@
 				"category": "Buttons"
 			}
 		],
-		"configuration":[
+		"jsonValidation": [
 			{
-				"title": "Buttons",
-				"properties": {
-					"buttons.scripts": {
-						"type": "array",
-						"description": "The scripts to be run when pressing buttons."
-					}
-				}
+				"fileMatch": "**/buttons.jsonc",
+				"url": "./src/buttonsSchema.json"
 			}
 		]
 	},
@@ -59,5 +54,8 @@
 		"typescript": "^3.6.4",
 		"tslint": "^5.20.0",
 		"vscode-test": "^1.2.2"
+	},
+	"dependencies": {
+		"jsonc-parser": "^2.2.0"
 	}
 }

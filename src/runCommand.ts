@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import { getWorkspaceFolder } from './utils';
+
 
 export async function runCommand(command: string) {
     let folder: vscode.WorkspaceFolder = getWorkspaceFolder();
@@ -6,15 +8,7 @@ export async function runCommand(command: string) {
     const terminal: vscode.Terminal = vscode.window.createTerminal();
 
     terminal.sendText(`cd "${folder.uri.fsPath}"`); // I think this is usually redudant?
-  
+
     terminal.sendText(command);
     terminal.show();
-}
-
-function getWorkspaceFolder(): vscode.WorkspaceFolder {
-    if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length >= 1) {
-        return vscode.workspace.workspaceFolders[0];
-    } else {
-        throw new Error('No workspace selected.');
-    }
 }
