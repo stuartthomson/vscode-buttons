@@ -3,6 +3,15 @@
 	"displayName": "vscode-buttons",
 	"description": "Create your own buttons!",
 	"publisher": "stuartthomson",
+	"author": {
+		"name": "Stuart Thomson"
+	},
+	"license": "MIT",
+	"keywords":[
+		"shell",
+		"terminal",
+		"buttons"
+	],
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/stuartthomson/vscode-buttons.git"
